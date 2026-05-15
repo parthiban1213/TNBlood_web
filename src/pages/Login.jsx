@@ -5,8 +5,8 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 
 const BT = ['A+','A-','B+','B-','AB+','AB-','O+','O-'];
-const IS = 'width:100%;background:var(--bg3);border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--text);font-family:var(--font-body);font-size:0.88rem;outline:none';
-const IS_PAD = 'width:100%;background:var(--bg3);border:1.5px solid var(--border);border-radius:10px;padding:11px 14px 11px 40px;color:var(--text);font-family:var(--font-body);font-size:0.9rem;outline:none;transition:border-color .17s';
+const IS = {width:'100%',background:'var(--bg3)',border:'1.5px solid var(--border)',borderRadius:10,padding:'10px 14px',color:'var(--text)',fontFamily:'var(--font-body)',fontSize:'0.88rem',outline:'none'};
+const IS_PAD = {width:'100%',background:'var(--bg3)',border:'1.5px solid var(--border)',borderRadius:10,padding:'11px 14px 11px 40px',color:'var(--text)',fontFamily:'var(--font-body)',fontSize:'0.9rem',outline:'none',transition:'border-color .17s'};
 
 export default function Login() {
   const { persistAndLogin } = useAuth();
@@ -417,7 +417,7 @@ function RegisterForm({ persistAndLogin, showToast, navigate, onBack, onSuccess 
     setLoading(false);
   }
 
-  const IS2 = 'width:100%;background:var(--bg3);border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--text);font-family:var(--font-body);font-size:0.88rem;outline:none';
+  const IS2 = {width:'100%',background:'var(--bg3)',border:'1.5px solid var(--border)',borderRadius:10,padding:'10px 14px',color:'var(--text)',fontFamily:'var(--font-body)',fontSize:'0.88rem',outline:'none'};
 
   return (
     <div id="step-register" style={{maxHeight:'62vh',overflowY:'auto',paddingRight:2}}>
