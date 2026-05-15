@@ -38,10 +38,12 @@ export default function RespondPage() {
 
   const userBT        = user?.bloodType || '';
   const _lastDon      = user?.lastDonationDate ? new Date(user.lastDonationDate) : null;
-  const _daysSince    = _lastDon ? Math.floor((Date.now()-_lastDon.getTime())/86400000) : 999;
+  // Guard against future lastDonationDate (bad data) — treat as today if date is in the future
+  const _lastDonSafe  = _lastDon && _lastDon.getTime() > Date.now() ? new Date() : _lastDon;
+  const _daysSince    = _lastDonSafe ? Math.floor((Date.now()-_lastDonSafe.getTime())/86400000) : 999;
   const isNotEligible = _daysSince < 90;
-  const _nextEligible = _lastDon ? new Date(_lastDon.getTime()+90*86400000) : null;
-  const _daysLeft     = isNotEligible ? (90-_daysSince) : 0;
+  const _nextEligible = _lastDonSafe ? new Date(_lastDonSafe.getTime()+90*86400000) : null;
+  const _daysLeft     = isNotEligible ? Math.max(0, 90-_daysSince) : 0;
   const isUnavailable = user?.isAvailable === false;
 
   async function respondToDonate(schedDate, schedTime) {

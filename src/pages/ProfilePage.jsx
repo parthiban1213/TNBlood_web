@@ -57,9 +57,11 @@ export default function ProfilePage() {
   }
 
   const initial = ((f.firstName || f.username || '?')[0] || '?').toUpperCase();
-  const lastDon = f.lastDonationDate ? new Date(f.lastDonationDate) : null;
-  const nextElig = lastDon && !isNaN(lastDon) ? new Date(lastDon.getTime() + 90*86400000) : null;
-  const daysLeft = nextElig ? Math.ceil((nextElig - Date.now()) / 86400000) : null;
+  const lastDon   = f.lastDonationDate ? new Date(f.lastDonationDate) : null;
+  // Guard against future lastDonationDate (bad data) — treat as today if date is in the future
+  const lastDonSafe = lastDon && lastDon.getTime() > Date.now() ? new Date() : lastDon;
+  const nextElig = lastDonSafe && !isNaN(lastDonSafe) ? new Date(lastDonSafe.getTime() + 90*86400000) : null;
+  const daysLeft = nextElig ? Math.max(0, Math.ceil((nextElig - Date.now()) / 86400000)) : null;
   const isElig   = daysLeft !== null ? daysLeft <= 0 : null;
 
   return (

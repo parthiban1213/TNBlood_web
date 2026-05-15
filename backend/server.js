@@ -16,6 +16,16 @@ http.ServerResponse.prototype.end = function(chunk, encoding, cb) {
 };
 
 const express  = require('express');
+
+// ── DATE HELPERS ───────────────────────────────────────────────
+// Clamp a lastDonationDate to today if it is somehow in the future (bad data entry).
+// Prevents the "270 days remaining" display bug caused by future dates.
+function clampLastDonationDate(raw) {
+  if (!raw) return null;
+  const d = new Date(raw);
+  if (isNaN(d.getTime())) return null;
+  return d.getTime() > Date.now() ? new Date() : d;
+}
 const mongoose = require('mongoose');
 const cors     = require('cors');
 const bcrypt   = require('bcryptjs');
@@ -1889,7 +1899,7 @@ app.put('/api/donors/:id', authenticate, adminOnly, async (req, res) => {
     if (req.body.country         !== undefined) updates.country          = req.body.country.trim();
     if (req.body.bloodType       !== undefined) updates.bloodType        = req.body.bloodType.trim();
     if (req.body.isAvailable     !== undefined) updates.isAvailable      = req.body.isAvailable !== false && req.body.isAvailable !== 'false';
-    if (req.body.lastDonationDate !== undefined) updates.lastDonationDate = req.body.lastDonationDate ? new Date(req.body.lastDonationDate) : null;
+    if (req.body.lastDonationDate !== undefined) updates.lastDonationDate = req.body.lastDonationDate ? clampLastDonationDate(req.body.lastDonationDate) : null;
 
     const user = await User.findByIdAndUpdate(req.params.id, updates, { new: true, runValidators: true }).lean();
     if (!user) return res.status(404).json({ success: false, error: 'Donor not found' });
@@ -3156,7 +3166,7 @@ app.post('/api/requirements/:id/donations/:donorUsername/status', authenticate, 
       const completionDate = new Date();
       const donorUser = await User.findOne({ username: donorUsername });
       if (donorUser) {
-        await User.findByIdAndUpdate(donorUser._id, { lastDonationDate: completionDate, isAvailable: false });
+        await User.findByIdAndUpdate(donorUser._id, { lastDonationDate: clampLastDonationDate(completionDate), isAvailable: false });
         console.log(`✅ lastDonationDate updated and isAvailable set to false for ${donorUsername} on completion`);
         // Sync gamification — update XP and badges for this donor
         syncGamification(donorUsername).catch(e => console.error('[Gamification] sync error:', e.message));
