@@ -20,16 +20,12 @@
     (function() {
       var qs = window.location.search;
       if (qs && qs.indexOf('?p=') === 0) {
-        var decoded = qs.slice(1)
-          .split('&')
-          .map(function(s) { return s.replace(/~and~/g, '&'); });
-        window.history.replaceState(
-          null, null,
-          window.location.pathname.slice(0, -1) +
-          (decoded[0] ? '/' + decoded[0].replace(/^p=\//, '') : '') +
-          (decoded[1] ? '?' + decoded[1].replace(/^q=/, '') : '') +
-          window.location.hash
-        );
+        var parts   = qs.slice(1).split('&').map(function(s){ return s.replace(/~and~/g,'&'); });
+        var subPath = parts[0] ? parts[0].replace(/^p=/, '') : '';
+        var query   = parts[1] ? '?' + parts[1].replace(/^q=/, '') : '';
+        // pathname ends with '/' (e.g. /TNBlood_web/), strip trailing slash
+        var base    = window.location.pathname.replace(/\/$/, '');
+        window.history.replaceState(null, null, base + subPath + query + window.location.hash);
       }
     })();
   </script>
