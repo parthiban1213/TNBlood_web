@@ -287,7 +287,7 @@ function UserOTPForm({ setLoginErr, persistAndLogin, showToast, navigate }) {
       )}
 
       {/* STEP REGISTER */}
-      {view==='step-register' && <RegisterForm persistAndLogin={persistAndLogin} showToast={showToast} navigate={navigate} onBack={()=>setView('otp-login')}/>}
+      {view==='step-register' && <RegisterForm persistAndLogin={persistAndLogin} showToast={showToast} navigate={navigate} onBack={()=>setView('otp-login')} onSuccess={()=>setShowAvail(true)}/>}
       {showAvail && <AvailabilityModal onClose={()=>{setShowAvail(false);navigate('/dashboard',{replace:true});}}/>}
     </div>
   );
@@ -372,7 +372,7 @@ function ForgotPwdPanel({ showToast, onBack }) {
 }
 
 /* ── Register form ───────────────────────────────────────── */
-function RegisterForm({ persistAndLogin, showToast, navigate, onBack }) {
+function RegisterForm({ persistAndLogin, showToast, navigate, onBack, onSuccess }) {
   const [mobile, setMobile]   = useState(''); const [otp, setOtp]     = useState('');
   const [otpSent, setOtpSent] = useState(false); const [otpVerified, setOtpVerified] = useState(false);
   const [firstName, setFN]    = useState(''); const [lastName, setLN]  = useState('');
@@ -413,7 +413,7 @@ function RegisterForm({ persistAndLogin, showToast, navigate, onBack }) {
     const username=firstName.toLowerCase().replace(/\s+/g,'')+mobile.trim().slice(-4);
     setLoading(true);
     try{const r=await fetch(API+'/auth/register-direct',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mobile:mobile.trim(),otp:otp.trim(),username,firstName:firstName.trim(),lastName:lastName.trim()||undefined,bloodType:bt,email:email.trim()||undefined,address:address.trim()||undefined,city:city.trim(),lastDonationDate:lastDon||undefined})});const d=await r.json();
-      if(d.success){clearInterval(timerRef.current);persistAndLogin(d.token,d.user);showToast('Welcome, '+firstName+'! You are now registered as a donor. 🩸','success');setShowAvail(true);}else setErr(d.error||'Registration failed.');}catch(e){setErr('Cannot connect to server.');}
+      if(d.success){clearInterval(timerRef.current);persistAndLogin(d.token,d.user);showToast('Welcome, '+firstName+'! You are now registered as a donor. 🩸','success');onSuccess?onSuccess():navigate('/dashboard',{replace:true});}else setErr(d.error||'Registration failed.');}catch(e){setErr('Cannot connect to server.');}
     setLoading(false);
   }
 
