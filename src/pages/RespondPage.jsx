@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import { useSocketEvent } from '../hooks/useSocketEvent.js';
 import ConfirmModal from '../components/ConfirmModal.jsx';
+import ReqDetailModal from './ReqDetailModalView.jsx';
 
 const URGENCY_ICON = {Critical:'🔴',High:'🟠',Medium:'🟡',Low:'🟢'};
 
@@ -17,6 +18,7 @@ export default function RespondPage() {
   const [loading, setLoading] = useState(true);
   const [donateModal, setDonateModal] = useState(null);
   const [cancelTarget, setCancelTarget] = useState(null);
+  const [viewId, setViewId] = useState(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -121,7 +123,7 @@ export default function RespondPage() {
                     </div>
                     <div className="respond-card-footer">
                       {footer}
-                      <button className="btn btn-ghost btn-sm" onClick={()=>{}} style={{marginLeft:'auto'}}>👁</button>
+                      <button className="btn btn-ghost btn-sm" onClick={()=>setViewId(r._id)} style={{marginLeft:'auto'}}>👁</button>
                     </div>
                   </div>
                 );
@@ -131,6 +133,7 @@ export default function RespondPage() {
         })()}
       </div>
 
+      {viewId && <ReqDetailModal reqId={viewId} onClose={()=>setViewId(null)}/>}
       {donateModal && <DonateModal patientName={donateModal.patientName} bloodType={donateModal.bloodType} onConfirm={respondToDonate} onCancel={()=>setDonateModal(null)}/>}
       {cancelTarget && <ConfirmModal title="Cancel Your Pledge?" body="Are you sure you want to withdraw your pledge for this request? The requester will no longer count on you." confirmLabel="✕ Cancel Pledge" danger onConfirm={cancelPledge} onCancel={()=>setCancelTarget(null)}/>}
     </div>

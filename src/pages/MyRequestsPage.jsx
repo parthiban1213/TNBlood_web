@@ -6,6 +6,8 @@ import { useSocketEvent } from '../hooks/useSocketEvent.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import ConfirmModal from '../components/ConfirmModal.jsx';
 import ReqFormModal from './ReqFormModalStandalone.jsx';
+import ReqDetailModal from './ReqDetailModalView.jsx';
+import ReqEditModal from './ReqEditModal.jsx';
 
 const URGENCY_ICON = {Critical:'🔴',High:'🟠',Medium:'🟡',Low:'🟢'};
 
@@ -16,6 +18,8 @@ export default function MyRequestsPage() {
   const [loading, setLoading] = useState(true);
   const [statusPopup, setStatusPopup] = useState(null);
   const [formOpen, setFormOpen] = useState(false);
+  const [editId, setEditId] = useState(null);
+  const [viewDetailId, setViewDetailId] = useState(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -89,8 +93,8 @@ export default function MyRequestsPage() {
                       <div style={{display:'flex',gap:5}}>
                         {r.status === 'Open'
                           ? <button className="btn btn-outline btn-sm" onClick={()=>setStatusPopup(r._id)}>📊 Status</button>
-                          : <button className="btn btn-outline btn-sm" onClick={()=>setStatusPopup(r._id)}>👁</button>}
-                        <button className="btn btn-outline btn-sm" onClick={()=>window.location.href=`/requirements?action=edit&id=${r._id}`}>✏️</button>
+                          : <button className="btn btn-outline btn-sm" onClick={()=>setViewDetailId(r._id)}>👁</button>}
+                        <button className="btn btn-outline btn-sm" onClick={()=>setEditId(r._id)}>✏️</button>
                       </div>
                     </td>
                   </tr>
@@ -101,7 +105,9 @@ export default function MyRequestsPage() {
         )}
       </div>
 
-      {formOpen && <ReqFormModal onClose={()=>setFormOpen(false)} onSaved={()=>{setFormOpen(false);load();}} />}
+      {formOpen      && <ReqFormModal     onClose={()=>setFormOpen(false)}       onSaved={()=>{setFormOpen(false);load();}} />}
+      {editId        && <ReqEditModal      reqId={editId} onClose={()=>setEditId(null)} onSaved={()=>{setEditId(null);load();}} />}
+      {viewDetailId  && <ReqDetailModal    reqId={viewDetailId} onClose={()=>setViewDetailId(null)}/>}
       {statusPopup && <StatusPopup reqId={statusPopup} user={user} isAdmin={isAdmin} onClose={()=>setStatusPopup(null)} onReload={load}/>}
     </div>
   );

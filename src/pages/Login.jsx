@@ -281,7 +281,7 @@ function UserOTPForm({ setLoginErr, persistAndLogin, showToast, navigate }) {
           <button className="login-btn" id="otp-verify-btn" onClick={verifyOTP} disabled={verifying} type="button">{verifying?'Verifying…':'✅ Verify OTP'}</button>
           <div style={{textAlign:'center',marginTop:10}}>
             <span id="otp-resend-timer" style={{fontSize:'0.78rem',color:'var(--text3)',fontFamily:'var(--font-ui)'}}>{cd>0?`Resend in ${cd}s`:''}</span>
-            {cd<=0 && <button id="otp-resend-btn" onClick={()=>{setView('otp-login');setOtpCode('');setOtpErr('');}} type="button" style={{fontSize:'0.78rem',color:'var(--red)',background:'none',border:'none',cursor:'pointer',fontFamily:'var(--font-ui)'}}>🔄 Resend OTP</button>}
+            {cd<=0 && <button id="otp-resend-btn" onClick={()=>{ setView('otp-login'); setOtpCode(''); setOtpErr(''); /* mobile kept — matches original resendOTP() pre-filling otpMobile */ }} type="button" style={{fontSize:'0.78rem',color:'var(--red)',background:'none',border:'none',cursor:'pointer',fontFamily:'var(--font-ui)'}}>🔄 Resend OTP</button>}
           </div>
         </div>
       )}
