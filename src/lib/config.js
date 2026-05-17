@@ -8,7 +8,7 @@
 
 // Update this to your Render backend URL (no trailing slash).
 // OR set VITE_RENDER_URL in GitHub Actions Repository Variables.
-const RENDER_URL = import.meta.env.VITE_RENDER_URL || 'https://hsblood.onrender.com';
+const RENDER_URL = import.meta.env.VITE_RENDER_URL || 'https://tnblood-api.onrender.com';
 
 export const API = (() => {
   const h = window.location.hostname;
