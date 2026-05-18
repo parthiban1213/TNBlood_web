@@ -745,7 +745,7 @@ const userSchema = new mongoose.Schema({
 const User = mongoose.model('User', userSchema);
 // ── Helper: convert a User doc to the "donor" shape the frontend expects ──────
 // The frontend donor screens use phone/firstName/lastName — we map from User fields.
-function userToDonor(u) {
+function userToDonor(u, donationCount = 0) {
   return {
     _id:             u._id,
     firstName:       u.firstName  || '',
@@ -762,6 +762,7 @@ function userToDonor(u) {
     updatedAt:       u.updatedAt  || u.createdAt,
     username:        u.username,
     role:            u.role,
+    donationCount,
   };
 }
 
@@ -1756,7 +1757,9 @@ app.get('/api/donors', authenticate, async (req, res) => {
       filter.isAvailable = req.query.available === 'true';
     if (req.query.email) filter.email = req.query.email.trim().toLowerCase();
     const users = await User.find(filter, '-password').sort('-createdAt').lean();
-    res.json({ success: true, data: users.map(userToDonor), count: users.length });
+    // Fetch each donor's completed donation count in parallel
+    const counts = await Promise.all(users.map(u => getCompletedDonationCount(u.username)));
+    res.json({ success: true, data: users.map((u, i) => userToDonor(u, counts[i])), count: users.length });
   } catch(err) { res.status(500).json({ success: false, error: friendlyError(err, 'Server') }); }
 });
 
@@ -1840,7 +1843,8 @@ app.get('/api/donors/:id', authenticate, async (req, res) => {
   try {
     const user = await User.findById(req.params.id, '-password').lean();
     if (!user) return res.status(404).json({ success: false, error: 'Donor not found' });
-    res.json({ success: true, data: userToDonor(user) });
+    const donationCount = await getCompletedDonationCount(user.username);
+    res.json({ success: true, data: userToDonor(user, donationCount) });
   } catch(err) { res.status(500).json({ success: false, error: friendlyError(err, 'Server') }); }
 });
 
