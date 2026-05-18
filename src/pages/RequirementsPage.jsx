@@ -230,6 +230,8 @@ function ReqFormModal({ reqId, onClose, onSaved, isAdmin, user }) {
                 <select id="req-bloodType" required={!f.acceptAnyBloodType} style={{...IS,cursor:'pointer',opacity:f.acceptAnyBloodType?0.5:1}} value={f.bloodType} onChange={e=>{up('bloodType',e.target.value);}} onBlur={()=>checkReqDup(f,setDupWarn,reqId)} disabled={f.acceptAnyBloodType}>
                   <option value="">Select blood type</option>{BT.map(b=><option key={b}>{b}</option>)}
                 </select>
+              </div>
+              <div className="form-group">
                 <label id="req-accept-any-label" className={`accept-any-checkbox${f.acceptAnyBloodType?' active':''}`} onClick={()=>setAcceptAny(!f.acceptAnyBloodType)} style={{cursor:'pointer'}}>
                   <span className="accept-any-check-wrap">
                     <input type="checkbox" id="req-acceptAnyBloodType" checked={f.acceptAnyBloodType} onChange={()=>{}} tabIndex={-1} style={{position:'absolute',opacity:0,pointerEvents:'none'}}/>
