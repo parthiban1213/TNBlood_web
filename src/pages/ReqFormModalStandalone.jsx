@@ -64,14 +64,14 @@ export default function ReqFormModal({ onClose, onSaved }) {
           <div className="form-grid">
             <div className="form-group">
               <label>Blood Type Required *</label>
-              <select required={!f.acceptAnyBloodType} style={{...IS,cursor:'pointer',opacity:f.acceptAnyBloodType?0.5:1}} value={f.bloodType} onChange={e=>up('bloodType',e.target.value)} onBlur={e=>checkDup('bloodType',e.target.value)} disabled={f.acceptAnyBloodType}>
+              <select required={!f.acceptAnyBloodType} style={{...IS,cursor:'pointer'}} value={f.bloodType} onChange={e=>up('bloodType',e.target.value)} onBlur={e=>checkDup('bloodType',e.target.value)}>
                 <option value="">Select blood type</option>{BT.map(b=><option key={b}>{b}</option>)}
               </select>
               <input type="hidden" id="req-urgency" value="Critical"/>
-              <label id="req-accept-any-label" className={`accept-any-checkbox${f.acceptAnyBloodType?' active':''}`} onClick={()=>up('acceptAnyBloodType',!f.acceptAnyBloodType)} style={{cursor:'pointer'}}>
-                <span className="accept-any-check-wrap"><input type="checkbox" checked={f.acceptAnyBloodType} onChange={()=>{}} tabIndex={-1} style={{position:'absolute',opacity:0,pointerEvents:'none'}}/><span className="accept-any-check-box"/></span>
-                <span className="accept-any-text"><span className="accept-any-title">Accept any blood type</span><span className="accept-any-sub">Any donor can volunteer, regardless of blood type</span></span>
-              </label>
+            </div>
+            <div id="req-accept-any-label" className={`accept-any-checkbox${f.acceptAnyBloodType?' active':''}`} onClick={()=>up('acceptAnyBloodType',!f.acceptAnyBloodType)} style={{cursor:'pointer',gridColumn:'1/-1'}}>
+              <span className="accept-any-check-wrap"><span className="accept-any-check-box"/></span>
+              <span className="accept-any-text"><span className="accept-any-title">Accept any blood type</span><span className="accept-any-sub">Any donor can volunteer, regardless of blood type</span></span>
             </div>
             <div className="form-group"><label>Units Required *</label><input type="number" required min={1} style={IS} placeholder="e.g. 2" value={f.unitsRequired} onChange={e=>up('unitsRequired',e.target.value)}/></div>
             <div className="form-group"><label>Required By Date</label><input type="date" style={IS} value={f.requiredBy} onChange={e=>up('requiredBy',e.target.value)}/></div>
