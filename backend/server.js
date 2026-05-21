@@ -1105,27 +1105,26 @@ function castAvailability(body) {
 
 // ─── AUTH ROUTES ──────────────────────────────────────────────
 
-// ── DEV OTP MODE ─────────────────────────────────────────────
-// Allows ALL mobile numbers in the database to log in / register
-// using a single fixed OTP — no Twilio SMS is sent.
-// Useful when numbers are not verified in Twilio (dev, QA, review builds).
+// ── Dev OTP mode — controlled via Render environment variables ───
+// Set these in Render → Environment:
+//   DEV_OTP_ENABLED = true     ← toggle the dev bypass on/off
+//   DEV_OTP         = 123456   ← the fixed OTP value
 //
-// Configure in Render → Environment:
-//   DEV_OTP_ENABLED = true     ← set to false to restore normal SMS flow
-//   DEV_OTP         = 123456   ← the fixed OTP all users must enter
-//
-// Both must be set for dev mode to activate.
+// The app receives devOtpEnabled in the /api/auth/otp/send response
+// and shows/hides the hint in the OTP screen accordingly.
+// No rebuild needed — just change DEV_OTP_ENABLED in Render and redeploy.
+
 const DEV_OTP_ENABLED = (process.env.DEV_OTP_ENABLED || '').trim().toLowerCase() === 'true';
 const DEV_OTP         = (process.env.DEV_OTP         || '').trim();
-
-function isDevOtp(otp) {
-  return DEV_OTP_ENABLED && DEV_OTP.length > 0 && otp === DEV_OTP;
-}
 
 if (DEV_OTP_ENABLED && DEV_OTP) {
   console.log(`🧪 Dev OTP mode ENABLED — all numbers accept OTP: ${DEV_OTP}`);
 } else if (DEV_OTP_ENABLED && !DEV_OTP) {
   console.warn('⚠️  DEV_OTP_ENABLED=true but DEV_OTP is not set — dev mode inactive.');
+}
+
+function isDevOtp(otp) {
+  return DEV_OTP_ENABLED && DEV_OTP.length > 0 && otp === DEV_OTP;
 }
 
 // ── OTP: Send OTP to mobile (for TN user login/register) ──
@@ -1161,7 +1160,7 @@ app.post('/api/auth/otp/send', async (req, res) => {
     const otp = generateOTP();
     otpStore.set(mob, { otp, expiresAt: Date.now() + 10 * 60 * 1000 });
 
-    // Skip SMS for the test bypass number — OTP is accepted via env var
+    // Skip SMS when dev OTP mode is active — fixed OTP is accepted instead
     if (DEV_OTP_ENABLED && DEV_OTP) {
       console.log(`🧪 Dev OTP bypass — skipping SMS for ${mob}`);
     } else {
@@ -1172,6 +1171,7 @@ app.post('/api/auth/otp/send', async (req, res) => {
       success: true,
       message: 'OTP sent successfully! Check your mobile.',
       isExistingUser: !!existingUser,
+      devOtpEnabled: DEV_OTP_ENABLED && DEV_OTP.length > 0,
     });
   } catch(err) {
     console.error('[OTP Send]', err.message);
