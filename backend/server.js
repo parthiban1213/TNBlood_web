@@ -2276,7 +2276,19 @@ app.get('/api/requirements/:id/donors', authenticate, async (req, res) => {
     const isRequester = req_.createdBy === req.user.username;
     if (!isAdmin_ && !isRequester)
       return res.status(403).json({ success: false, error: 'Only the requester or admin can view this.' });
-    res.json({ success: true, data: req_.donations || [], count: (req_.donations || []).length });
+
+    // Enrich each donation with the donor's mobile number from the User record.
+    const donations = req_.donations || [];
+    const usernames = [...new Set(donations.map(d => d.donorUsername).filter(Boolean))];
+    const users     = await User.find({ username: { $in: usernames } }, 'username mobile').lean();
+    const mobileMap = Object.fromEntries(users.map(u => [u.username, u.mobile || '']));
+
+    const enriched = donations.map(d => ({
+      ...d.toObject ? d.toObject() : d,
+      donorMobile: mobileMap[d.donorUsername] || '',
+    }));
+
+    res.json({ success: true, data: enriched, count: enriched.length });
   } catch(err) { res.status(500).json({ success: false, error: friendlyError(err, 'Server') }); }
 });
 // Admin only — bulk upload requirements from Excel
