@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>TNBlood</title>
+  <script>
+    // GitHub Pages SPA fix — redirects all 404s back to index.html
+    // preserving the intended path as a query parameter.
+    // The decode script in index.html restores the URL before React boots.
+    (function() {
+      var l = window.location;
+      // segmentCount = number of path segments in the repo prefix.
+      // For https://user.github.io/TNBlood_web/  → 1 segment → slice(0, 2)
+      var segmentCount = 1;
+      var repoPath = l.pathname.split('/').slice(0, segmentCount + 1).join('/');
+      var subPath  = l.pathname.split('/').slice(segmentCount + 1).join('/');
+      l.replace(
+        l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+        repoPath + '/?p=/' +
+        subPath.replace(/&/g, '~and~') +
+        (l.search ? '&q=' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+        l.hash
+      );
+    })();
+  </script>
+</head>
+<body></body>
+</html>
