@@ -1172,6 +1172,7 @@ app.post('/api/auth/otp/send', async (req, res) => {
       message: 'OTP sent successfully! Check your mobile.',
       isExistingUser: !!existingUser,
       devOtpEnabled: DEV_OTP_ENABLED && DEV_OTP.length > 0,
+      devOtp: DEV_OTP_ENABLED && DEV_OTP.length > 0 ? DEV_OTP : null,
     });
   } catch(err) {
     console.error('[OTP Send]', err.message);
